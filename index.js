@@ -37,11 +37,11 @@ async function run() {
         app.get('/mytoys/:email', async (req, res) => {
             const email = req.params.email;
             // console.log(email);
-      
+
             const query = { seller_email: email };
             const cursor = await toysCollection.find(query).toArray();
             res.send(cursor);
-          });
+        });
 
         app.post('/toys', async (req, res) => {
             const newToy = req.body;
@@ -52,13 +52,31 @@ async function run() {
         app.get('/toys/:id', async (req, res) => {
             const id = req.params.id;
             // console.log(email);
-      
-            const query = { _id: new ObjectId(id) };
-            const cursor = await toysCollection.find(query).toArray();
-            res.send(cursor);
-          });
 
-        
+            const query = { _id: new ObjectId(id) };
+            const cursor = await toysCollection.findOne(query);
+            res.send(cursor);
+        });
+
+        app.patch('/toys/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(req.body);
+            const filter = { _id: new ObjectId(id) };
+            const { price, quantity, details } = req.body;
+            const updatedDoc = {
+                $set: {
+                    price: price,
+                    quantity: quantity,
+                    details: details
+                },
+            };
+
+            const result = await toysCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        });
+
+
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
