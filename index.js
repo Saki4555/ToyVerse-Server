@@ -9,8 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 
-// marketplaceUser
-// jXRNarHM8D07pwAw
+
 
 
 
@@ -34,6 +33,25 @@ async function run() {
 
         const toysCollection = client.db('marketplaceDb').collection('toys');
 
+        const indexKeys = { name: 1 };
+        const indexOptions = { name: "nameIndex" };
+        const result = await toysCollection.createIndex(indexKeys, indexOptions);
+        console.log(result);
+
+        app.get('/alltoys', async (req, res) => {
+            const result = await toysCollection.find().limit(20).toArray();
+            res.send(result);
+
+        });
+
+        app.get("/getToysByText/:text", async (req, res) => {
+            const text = req.params.text;
+            const result = await toysCollection.find({ name: { $regex: text, $options: "i" } }).toArray();
+            res.send(result);
+        });
+
+
+
         app.get('/mytoys/:email', async (req, res) => {
             const email = req.params.email;
             // console.log(email);
@@ -51,7 +69,7 @@ async function run() {
 
         app.get('/toys/:id', async (req, res) => {
             const id = req.params.id;
-            // console.log(email);
+            // console.log(id);
 
             const query = { _id: new ObjectId(id) };
             const cursor = await toysCollection.findOne(query);
@@ -78,10 +96,10 @@ async function run() {
         app.delete('/mytoys/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
-      
+
             const result = await toysCollection.deleteOne(query);
             res.send(result);
-          });
+        });
 
 
 
