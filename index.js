@@ -54,11 +54,24 @@ async function run() {
 
         app.get('/mytoys/:email', async (req, res) => {
             const email = req.params.email;
+            const toSort = req.query.toSort;
+            
+            console.log(toSort);
             // console.log(email);
 
+
             const query = { seller_email: email };
-            const cursor = await toysCollection.find(query).toArray();
-            res.send(cursor);
+            if(toSort === 'Ascending'){
+                const cursor = await toysCollection.find(query).sort({ price: 1 }).toArray();
+                res.send(cursor);
+            }
+            else{
+                const cursor = await toysCollection.find(query).sort({ price: -1 }).toArray();
+                res.send(cursor);
+            }
+
+           
+           
         });
 
         app.post('/toys', async (req, res) => {
